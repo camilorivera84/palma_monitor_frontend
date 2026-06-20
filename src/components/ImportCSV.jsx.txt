@@ -1,0 +1,98 @@
+import React, { useState } from 'react';
+import { palmaService } from '../services/palmaService';
+
+const ImportCSV = () => {
+    const [file, setFile] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [result, setResult] = useState(null);
+    const [error, setError] = useState(null);
+
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            setResult(null);
+            setError(null);
+        }
+    };
+
+    const handleImport = async () => {
+        if (!file) {
+            setError('Por favor selecciona un archivo CSV');
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+        setResult(null);
+
+        try {
+            const response = await palmaService.importCSV(file);
+            setResult(response);
+            setFile(null);
+            // Reset file input
+            document.getElementById('fileInput').value = '';
+        } catch (err) {
+            setError(err.response?.data?.message || 'Error al importar el archivo');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="import-csv-container">
+            <h2>Importar Datos de Palmas</h2>
+            
+            <div className="upload-area">
+                <input
+                    id="fileInput"
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileChange}
+                    disabled={loading}
+                />
+                <button 
+                    onClick={handleImport} 
+                    disabled={!file || loading}
+                >
+                    {loading ? 'Importando...' : 'Importar CSV'}
+                </button>
+            </div>
+
+            {file && (
+                <div className="file-info">
+                    <p>Archivo seleccionado: {file.name}</p>
+                    <p>Tamaño: {(file.size / 1024).toFixed(2)} KB</p>
+                </div>
+            )}
+
+            {error && (
+                <div className="error-message">
+                    ❌ {error}
+                </div>
+            )}
+
+            {result && (
+                <div className="result-message">
+                    <h3>✅ Importación completada</h3>
+                    <p>Total de registros: {result.total}</p>
+                    <p>Insertados: {result.inserted}</p>
+                    {result.errors?.length > 0 && (
+                        <div className="errors-list">
+                            <h4>Errores encontrados:</h4>
+                            <ul>
+                                {result.errors.map((err, index) => (
+                                    <li key={index}>
+                                        Fila {err.row.id}: {err.error}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default ImportCSV;

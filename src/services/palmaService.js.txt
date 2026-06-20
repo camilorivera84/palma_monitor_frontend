@@ -1,0 +1,53 @@
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+export const palmaService = {
+    // Importar CSV
+    async importCSV(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await axios.post(`${API_URL}/import-csv`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round(
+                        (progressEvent.loaded * 100) / progressEvent.total
+                    );
+                    console.log(`Progreso: ${percentCompleted}%`);
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error al importar CSV:', error);
+            throw error;
+        }
+    },
+
+    // Obtener todas las palmas
+    async getAll() {
+        const response = await axios.get(`${API_URL}/palmas`);
+        return response.data;
+    },
+
+    // Obtener palma por ID
+    async getById(id) {
+        const response = await axios.get(`${API_URL}/palmas/${id}`);
+        return response.data;
+    },
+
+    // Actualizar palma
+    async update(id, data) {
+        const response = await axios.put(`${API_URL}/palmas/${id}`, data);
+        return response.data;
+    },
+
+    // Eliminar palma
+    async delete(id) {
+        const response = await axios.delete(`${API_URL}/palmas/${id}`);
+        return response.data;
+    }
+};
