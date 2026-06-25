@@ -497,11 +497,16 @@ function Dashboard() {
                       <td style={{ padding: '12px' }}>
                         {palma.descarte || 'N/A'}
                       </td>
+                      {/* ✅ CORREGIDO: Convertir a número antes de toFixed */}
                       <td style={{ padding: '12px' }}>
-                        {palma.latitud?.toFixed(5) || 'N/A'}
+                        {palma.latitud
+                          ? Number(palma.latitud).toFixed(5)
+                          : 'N/A'}
                       </td>
                       <td style={{ padding: '12px' }}>
-                        {palma.longitud?.toFixed(5) || 'N/A'}
+                        {palma.longitud
+                          ? Number(palma.longitud).toFixed(5)
+                          : 'N/A'}
                       </td>
                     </tr>
                   ))
