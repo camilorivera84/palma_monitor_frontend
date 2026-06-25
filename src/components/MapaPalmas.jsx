@@ -28,6 +28,16 @@ function ChangeView({ center, zoom }) {
 }
 
 // ============================================
+// FUNCIÓN SEGURA PARA FORMATEAR NÚMEROS
+// ============================================
+const formatNumber = (value, decimals = 5) => {
+  if (value === null || value === undefined || value === '') return 'N/A';
+  const num = Number(value);
+  if (isNaN(num)) return 'N/A';
+  return num.toFixed(decimals);
+};
+
+// ============================================
 // FUNCIÓN PARA CREAR ICONO DE PALMA PEQUEÑO
 // ============================================
 function createPalmIcon(estado) {
@@ -120,64 +130,74 @@ function MapaPalmas({ palmas }) {
         />
 
         {/* Renderizar TODAS las palmas con icono de palma pequeño */}
-        {palmas.map((palma) => (
-          <Marker
-            key={palma.id}
-            position={[palma.latitud, palma.longitud]}
-            icon={createPalmIcon(palma.estado)}
-          >
-            <Popup>
-              <div
-                style={{ minWidth: '180px', fontFamily: 'Arial, sans-serif' }}
-              >
-                <h4
-                  style={{
-                    margin: '0 0 6px 0',
-                    color: '#1a1a2e',
-                    fontSize: '14px',
-                  }}
+        {palmas.map((palma) => {
+          // ✅ CONVERTIR A NÚMERO DE FORMA SEGURA
+          const lat = Number(palma.latitud);
+          const lng = Number(palma.longitud);
+
+          // ✅ VALIDAR QUE SEAN NÚMEROS VÁLIDOS
+          if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) return null;
+
+          return (
+            <Marker
+              key={palma.id}
+              position={[lat, lng]}
+              icon={createPalmIcon(palma.estado)}
+            >
+              <Popup>
+                <div
+                  style={{ minWidth: '180px', fontFamily: 'Arial, sans-serif' }}
                 >
-                  🌴 Palma #{palma.id}
-                </h4>
-                <hr style={{ margin: '4px 0' }} />
-                <p style={{ margin: '2px 0', fontSize: '12px' }}>
-                  <strong>Lote:</strong> {palma.lote || 'N/A'}
-                </p>
-                <p style={{ margin: '2px 0', fontSize: '12px' }}>
-                  <strong>Línea:</strong> {palma.linea || 'N/A'}
-                </p>
-                <p style={{ margin: '2px 0', fontSize: '12px' }}>
-                  <strong>Palma:</strong> {palma.palma || 'N/A'}
-                </p>
-                <p style={{ margin: '2px 0', fontSize: '12px' }}>
-                  <strong>Estado:</strong>{' '}
-                  <span
+                  <h4
                     style={{
-                      display: 'inline-block',
-                      padding: '1px 8px',
-                      borderRadius: '10px',
-                      background:
-                        palma.estado === 'ACTIVA' ? '#d4edda' : '#f8d7da',
-                      color: palma.estado === 'ACTIVA' ? '#155724' : '#721c24',
-                      fontWeight: 'bold',
-                      fontSize: '11px',
+                      margin: '0 0 6px 0',
+                      color: '#1a1a2e',
+                      fontSize: '14px',
                     }}
                   >
-                    {palma.estado || 'DESCONOCIDO'}
-                  </span>
-                </p>
-                <p style={{ margin: '2px 0', fontSize: '10px', color: '#999' }}>
-                  📍 {palma.latitud?.toFixed(5)}, {palma.longitud?.toFixed(5)}
-                </p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+                    🌴 Palma #{palma.id}
+                  </h4>
+                  <hr style={{ margin: '4px 0' }} />
+                  <p style={{ margin: '2px 0', fontSize: '12px' }}>
+                    <strong>Lote:</strong> {palma.lote || 'N/A'}
+                  </p>
+                  <p style={{ margin: '2px 0', fontSize: '12px' }}>
+                    <strong>Línea:</strong> {palma.linea || 'N/A'}
+                  </p>
+                  <p style={{ margin: '2px 0', fontSize: '12px' }}>
+                    <strong>Palma:</strong> {palma.palma || 'N/A'}
+                  </p>
+                  <p style={{ margin: '2px 0', fontSize: '12px' }}>
+                    <strong>Estado:</strong>{' '}
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        padding: '1px 8px',
+                        borderRadius: '10px',
+                        background:
+                          palma.estado === 'ACTIVA' ? '#d4edda' : '#f8d7da',
+                        color:
+                          palma.estado === 'ACTIVA' ? '#155724' : '#721c24',
+                        fontWeight: 'bold',
+                        fontSize: '11px',
+                      }}
+                    >
+                      {palma.estado || 'DESCONOCIDO'}
+                    </span>
+                  </p>
+                  <p
+                    style={{ margin: '2px 0', fontSize: '10px', color: '#999' }}
+                  >
+                    📍 {formatNumber(lat)}, {formatNumber(lng)}
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
       </MapContainer>
     </div>
   );
 }
 
 export default MapaPalmas;
-
-
