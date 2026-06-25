@@ -1,3 +1,4 @@
+// FORZAR ACTUALIZACIÓN - v2.0.1 - 2026-06-25
 import React, { useState, useEffect } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import axios from 'axios';
